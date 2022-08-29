@@ -3,10 +3,7 @@
     <div class="alert alert-danger" v-if="this.error_message">
       {{ this.error_message }}
     </div>
-    <div
-      class="alert alert-danger"
-      v-for="item in this.validation_errors"
-      :key="item"
+    <div class="alert alert-danger" v-for="item in this.validation_errors" :key="item"
     >
       {{ item }}
     </div>
@@ -62,6 +59,7 @@ export default {
       this.$axios
         .$post("api/login", this.login_data)
         .then((response) => {
+         
           this.saveIntoStorage(response);
 
           this.$router.push("/");

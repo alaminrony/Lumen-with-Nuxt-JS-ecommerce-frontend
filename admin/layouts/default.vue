@@ -19,13 +19,13 @@ import AdminHeader from "../components/partials/AdminHeader";
 
 export default {
   head: {
-    title: 'Home page',
+    title: "Home page",
     meta: [
       {
-        hid: 'description',
-        name: 'description',
-        content: 'Home page description'
-      }
+        hid: "description",
+        name: "description",
+        content: "Home page description",
+      },
     ],
   },
   components: { AdminHeader, AdminSidebar, MobileHeader },
@@ -33,6 +33,8 @@ export default {
     const script = document.createElement("script");
     script.src = "/js/main.js";
     script.type = "text/javascript";
+
+    // console.log(script.src);return false;
     document.head.appendChild(script);
 
     this.checkUserLogin();

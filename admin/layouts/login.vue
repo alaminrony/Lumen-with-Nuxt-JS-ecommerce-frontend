@@ -7,7 +7,6 @@
             <div class="login-logo">
               <a href="#"> <strong>Online Shop</strong> Admin Login </a>
             </div>
-
             <nuxt></nuxt>
           </div>
         </div>
