@@ -9,6 +9,13 @@ export const state = () => ({
   },
   categoryHtmlTree: "",
   features: [],
+  filterData: {
+    id: "",
+    title: "",
+    parent_id: "",
+  },
+  page: 1,
+  categoryList: {},
 });
 
 export const mutations = {
@@ -65,6 +72,15 @@ export const mutations = {
 
     state.features = features;
   },
+  setCategoryList(state, category_list) {
+    state.categoryList = category_list;
+  },
+  setPage(state, page) {
+    state.page = page;
+  },
+  setFilterData(state, value) {
+    state.filterData[value.key] = value.val;
+  },
 };
 
 export const actions = {
@@ -89,6 +105,147 @@ export const actions = {
     dataToSend.features = payload.features;
 
     CategoryApi.create(this.$axios, dataToSend)
+      .then((response) => {
+        commit(
+          "shared/setStatusMessageParameter",
+          { key: "showLoading", val: false },
+          { root: true }
+        );
+        if (response.success) {
+          commit(
+            "shared/setStatusMessageParameter",
+            { key: "success_message", val: response.message },
+            { root: true }
+          );
+        }
+
+        setTimeout(() => {
+          payload.router.push("/category");
+        }, 2000);
+      })
+      .catch((err) => {
+        commit(
+          "shared/setStatusMessageParameter",
+          { key: "showLoading", val: false },
+          { root: true }
+        );
+        if (err.response.data) {
+          commit(
+            "shared/setStatusMessageParameter",
+            { key: "error_message", val: err.response.data.message },
+            { root: true }
+          );
+          if (err.response.data.errors) {
+            let errors = [];
+            for (let key in err.response.data.errors) {
+              errors.push(err.response.data.errors[key][0]);
+            }
+
+            commit(
+              "shared/setStatusMessageParameter",
+              { key: "validation_errors", val: errors },
+              { root: true }
+            );
+          }
+        }
+      })
+      .finally(() => {
+        setTimeout(() => {
+          commit("shared/resetStatusMessagesParameters", null, { root: true });
+          commit("resetCategory");
+        }, 3000);
+      });
+  },
+  listCategories({ commit }, payload = null) {
+    CategoryApi.list(this.$axios, payload).then((response) => {
+      commit("setCategoryList", response.categories);
+    });
+  },
+  deleteCategory({ commit, state }, id) {
+    commit("shared/resetStatusMessagesParameters", null, { root: true });
+    commit(
+      "shared/setStatusMessageParameter",
+      { key: "showLoading", val: true },
+      { root: true }
+    );
+
+    CategoryApi.delete(this.$axios, id)
+      .then((response) => {
+        commit(
+          "shared/setStatusMessageParameter",
+          { key: "showLoading", val: false },
+          { root: true }
+        );
+        if (response.success) {
+          let categoryList = { ...state.categoryList };
+          // console.log(categoryList);return false;
+          categoryList.data = categoryList.data.filter(
+            (item) => item.id !== id
+          );
+
+          commit("setCategoryList", categoryList);
+          commit(
+            "shared/setStatusMessageParameter",
+            { key: "success_message", val: response.message },
+            { root: true }
+          );
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setTimeout(() => {
+          commit("shared/resetStatusMessagesParameters", null, { root: true });
+        }, 3000);
+      });
+  },
+  showCategory({ commit }, id) {
+    // alert(id);return false;
+    commit("shared/resetStatusMessagesParameters", null, { root: true });
+    commit(
+      "shared/setStatusMessageParameter",
+      { key: "showLoading", val: true },
+      { root: true }
+    );
+
+    CategoryApi.show(this.$axios, id)
+      .then((response) => {
+        commit(
+          "shared/setStatusMessageParameter",
+          { key: "showLoading", val: false },
+          { root: true }
+        );
+
+        if (response.category) {
+          commit("setTitle", response.category.title);
+          commit("setDescription", response.category.description);
+          commit("setParentId", response.category.parent_id);
+          commit("setFeatured", response.category.featured);
+
+          // set features
+          if (response.category.features) {
+            commit("setFeatures", response.category.features);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  },
+  updateCategory({ commit }, payload) {
+    // console.log(payload);return false;
+    commit("shared/resetStatusMessagesParameters", null, { root: true });
+    commit(
+      "shared/setStatusMessageParameter",
+      { key: "showLoading", val: true },
+      { root: true }
+    );
+
+    const dataToSend = payload.data;
+    dataToSend.features = payload.features;
+
+    CategoryApi.update(this.$axios, dataToSend, payload.id)
       .then((response) => {
         commit(
           "shared/setStatusMessageParameter",

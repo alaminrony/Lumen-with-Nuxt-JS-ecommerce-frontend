@@ -42,5 +42,7 @@ export default {
   },
 
   srcDir: __dirname,
-  buildDir: '.nuxt/frontend'
+  buildDir: '.nuxt/frontend',
+
+  // loading: false
 }

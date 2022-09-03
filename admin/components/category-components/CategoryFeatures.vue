@@ -30,6 +30,7 @@
         computed: {
           features: {
             get() {
+              // console.log(this.$store.state.category.features);
               return this.$store.state.category.features;
             }
           }
@@ -44,6 +45,7 @@
             this.$store.commit('category/removeFromFeature', id);
           },
           updateFieldTitle(e, id) {
+            console.log(id);
             this.$store.commit('category/updateFeatureTitle', {id, value: e.target.value});
           },
           updateFieldType(e, id) {

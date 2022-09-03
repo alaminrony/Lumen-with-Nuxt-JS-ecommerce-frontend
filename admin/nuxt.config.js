@@ -56,6 +56,7 @@ export default {
   ** https://nuxtjs.org/guide/plugins
   */
   plugins: [
+    '@/plugins/date_format.js',
   ],
   /*
   ** Auto import components
@@ -75,6 +76,8 @@ export default {
     // 'bootstrap-vue/nuxt',
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
+    '@nuxtjs/toast',
+    'nuxt-sweetalert2',
   ],
   /*
   ** Axios module configuration

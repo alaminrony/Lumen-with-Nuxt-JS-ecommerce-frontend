@@ -1,7 +1,7 @@
 const CategoryApi = {
-  getCategoriesHtmlTree: (axios, exceptId = null) => {
+  getCategoriesHtmlTree(axios, exceptId = null){
+    // alert(exceptId);return false;
     const except = exceptId ? "?except_id=" + exceptId : "";
-
     return axios.$get("/api/category/htmltree" + except);
   },
   create: (axios, payload) => {
@@ -24,8 +24,8 @@ const CategoryApi = {
   show: (axios, id) => {
     return axios.$get("/api/category/" + id);
   },
-  update(axios, payload, id) {
-    return axios.$put("/api/category/" + id, payload);
+  async update(axios, payload, id) {
+    return await axios.$put("/api/category/" + id, payload);
   },
 };
 
