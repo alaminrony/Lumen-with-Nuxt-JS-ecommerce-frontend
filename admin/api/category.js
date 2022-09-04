@@ -16,6 +16,8 @@ const CategoryApi = {
       }
     }
 
+    // console.log(payload_arr);return false;
+
     return axios.$get("/api/category?" + payload_arr.join("&"));
   },
   delete: (axios, id) => {

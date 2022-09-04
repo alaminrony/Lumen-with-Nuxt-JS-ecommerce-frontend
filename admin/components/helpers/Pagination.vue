@@ -34,14 +34,12 @@
         props: ["data"],
         methods: {
           numPages() {
-            // console.log(Math.ceil(this.data.total / this.data.per_page));return false;
             return Math.ceil(this.data.total / this.data.per_page);
           },
           showPaginator() {
             if(this.numPages() > 1) {
               return true;
             }
-
             return false;
           },
           displayPage(page_number) {

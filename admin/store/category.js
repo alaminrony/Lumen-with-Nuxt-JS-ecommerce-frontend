@@ -1,5 +1,4 @@
 import { CategoryApi } from "../api/category";
-
 export const state = () => ({
   category: {
     title: "",
@@ -16,6 +15,7 @@ export const state = () => ({
   },
   page: 1,
   categoryList: {},
+  pagination: {},
 });
 
 export const mutations = {
@@ -74,6 +74,9 @@ export const mutations = {
   },
   setCategoryList(state, category_list) {
     state.categoryList = category_list;
+  },
+  setCategoryPagination(state, pagination) {
+    state.pagination = pagination;
   },
   setPage(state, page) {
     state.page = page;
@@ -157,8 +160,10 @@ export const actions = {
       });
   },
   listCategories({ commit }, payload = null) {
+    // console.log(payload);return false;
     CategoryApi.list(this.$axios, payload).then((response) => {
-      commit("setCategoryList", response.categories);
+      commit("setCategoryList", response.data.categories);
+      commit("setCategoryPagination", response.meta);
     });
   },
   deleteCategory({ commit, state }, id) {

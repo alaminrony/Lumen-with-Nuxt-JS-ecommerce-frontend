@@ -56,7 +56,7 @@ export default {
   ** https://nuxtjs.org/guide/plugins
   */
   plugins: [
-    '@/plugins/date_format.js',
+    '@/plugins/filter.js',
   ],
   /*
   ** Auto import components
@@ -67,6 +67,7 @@ export default {
   ** Nuxt.js dev-modules
   */
   buildModules: [
+    '@nuxtjs/moment',
   ],
   /*
   ** Nuxt.js modules

@@ -3,10 +3,10 @@
     <h4>Filter</h4>
     <div class="row">
       <div class="col-1">
-        <input type="text" class="form-control" placeholder="Id" name="id" @change="handleFiltering($event)" :value="this.$store.state.category.filterData.id">
+        <input type="text" class="form-control" placeholder="Id" name="id" @keyup="handleFiltering($event)" :value="this.$store.state.category.filterData.id">
       </div>
       <div class="col-3">
-        <input type="text" class="form-control" placeholder="Title" name="title" @change="handleFiltering($event)" :value="this.$store.state.category.filterData.title">
+        <input type="text" class="form-control" placeholder="Title" name="title" @keyup="handleFiltering($event)" :value="this.$store.state.category.filterData.title">
       </div>
       <div class="col-3">
         <select class="form-control" v-html="this.$store.state.category.categoryHtmlTree" name="parent_id" @change="handleFiltering($event)" :value="this.$store.state.category.filterData.parent_id">
@@ -26,6 +26,7 @@
         name: "CategoryFilter",
         methods: {
           handleFiltering(event) {
+            // console.log(event.target.value);return false;
             this.$emit('Filtering', event.target.name, event.target.value);
           }
         }

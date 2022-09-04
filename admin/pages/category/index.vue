@@ -6,7 +6,7 @@
           <div class="col-md-12">
             <loader></loader>
             <status-messages></status-messages>
-            <CategoryFilter v-on:Filtering="handleFiltering"></CategoryFilter>
+            <CategoryFilter @Filtering="handleFiltering"></CategoryFilter>
           </div>
           <div class="col-md-12">
             <!-- DATA TABLE-->
@@ -22,10 +22,9 @@
                     <th>Options</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody v-if="categoryList">
                   <CategoryRow
-                    v-if="categoryList.data"
-                    v-for="category of categoryList.data"
+                    v-for="category of categoryList"
                     :category="category"
                     :key="category.id"
                     @removeCategory="removeCategory"
@@ -34,9 +33,9 @@
               </table>
             </div>
             <Pagination
-              :data="categoryList"
-              v-if="categoryList.data"
-              v-on:handlePagination="handlePagination"
+              :data="pagination"
+              v-if="categoryList"
+              @handlePagination="handlePagination"
             ></Pagination>
           </div>
         </div>
@@ -72,20 +71,27 @@ export default {
       // console.log(this.$store.state.category.categoryList);return false;
       return this.$store.state.category.categoryList;
     },
+    pagination() {
+      // console.log(this.$store.state.category.pagination);return false;
+      return this.$store.state.category.pagination;
+    },
   },
   methods: {
     handlePagination(page_number) {
+      // alert(page_number);return false;
       this.$store.commit("category/setPage", page_number);
       this.$store.dispatch("category/listCategories", this.getPayload());
     },
     handleFiltering(field, value) {
+      // console.log(value);return false;
       this.$store.commit("category/setFilterData", { key: field, val: value });
       this.$store.commit("category/setPage", 1);
 
       this.$store.dispatch("category/listCategories", this.getPayload());
     },
-    getPayload() {
+    getPayload : function() {
       let payload = {};
+     
       for (let field in this.$store.state.category.filterData) {
         if (
           this.$store.state.category.filterData.hasOwnProperty(field) &&
@@ -95,7 +101,8 @@ export default {
             this.$store.state.category.filterData[field];
       }
       payload.page = this.$store.state.category.page;
-
+      
+      //  console.log(payload);return false;
       return payload;
     },
     removeCategory(id) {
