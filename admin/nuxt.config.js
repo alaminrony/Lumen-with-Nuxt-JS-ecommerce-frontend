@@ -43,6 +43,10 @@ export default {
       {
         src: '/vendor/bootstrap-4.1/bootstrap.min.js',
         type: 'text/javascript'
+      },
+      {
+        src: 'https://cdn.jsdelivr.net/npm/sweetalert2@11',
+        type: 'text/javascript'
       }
     ]
   },

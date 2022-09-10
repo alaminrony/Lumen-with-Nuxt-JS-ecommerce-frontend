@@ -116,9 +116,23 @@ export default {
       return payload;
     },
     removeBrand(id) {
-      if (confirm("Are you sure?")) {
-        this.$store.dispatch("brand/deleteBrand", id);
-      }
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You want to delete. You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DC3545",
+        cancelButtonColor: "#198754",
+        confirmButtonText: "Yes, delete it!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.$store.dispatch("brand/deleteBrand", id);
+          Swal.fire("Deleted!", "Your file has been deleted.", "success");
+        }
+      });
+      // if (confirm("Are you sure?")) {
+      //   this.$store.dispatch("brand/deleteBrand", id);
+      // }
     },
     createBrand() {
       this.$store.commit("brand/resetBrand");

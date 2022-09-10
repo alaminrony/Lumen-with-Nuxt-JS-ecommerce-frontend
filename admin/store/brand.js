@@ -12,7 +12,7 @@ export const state = () => ({
   page: 1,
   brandList: {},
   allBrands: [], // used to fill brand dropdown in product create screen
-  getHeadTitle: "Brand Title"
+  getHeadTitle: "Brand"
 });
 
 export const mutations = {

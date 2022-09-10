@@ -56,7 +56,7 @@ export default {
   name: "index",
   middleware: "auth",
   head: {
-    title: 'Category',
+    title: "Category",
     meta: [
       {
         hid: "description",
@@ -99,9 +99,9 @@ export default {
 
       this.$store.dispatch("category/listCategories", this.getPayload());
     },
-    getPayload : function() {
+    getPayload: function () {
       let payload = {};
-     
+
       for (let field in this.$store.state.category.filterData) {
         if (
           this.$store.state.category.filterData.hasOwnProperty(field) &&
@@ -111,17 +111,31 @@ export default {
             this.$store.state.category.filterData[field];
       }
       payload.page = this.$store.state.category.page;
-      
+
       //  console.log(payload);return false;
       return payload;
     },
     removeCategory(id) {
-      if (confirm("Are you sure?")) {
-        this.$store.dispatch("category/deleteCategory", id);
-      }
+      Swal.fire({
+        title: "Are you sure?",
+        text: "You want to delete. You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DC3545",
+        cancelButtonColor: "#198754",
+        confirmButtonText: "Yes, delete it!",
+        
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.$store.dispatch("category/deleteCategory", id);
+          Swal.fire("Deleted!", "Your file has been deleted.", "success");
+        }
+      });
+      // if (confirm("Are you sure?")) {
+      //   this.$store.dispatch("category/deleteCategory", id);
+      // }
     },
   },
-  
 };
 </script>
 
