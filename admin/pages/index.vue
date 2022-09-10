@@ -64,7 +64,7 @@
                   </div>
                   <div class="text">
                     <h2>$1,060,386</h2>
-                    <span>total earnings</span>
+                    <span>ffgfdgf</span>
                   </div>
                 </div>
               </div>
@@ -79,7 +79,17 @@
 <script>
 export default {
   name: "index",
-  middleware: "auth"
+  middleware: "auth",
+  head: {
+    title: 'Dashboard',
+    meta: [
+      {
+        hid: "description",
+        name: "description",
+        content: "Dashboard description",
+      },
+    ],
+  },
 };
 </script>
 

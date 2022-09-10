@@ -18,16 +18,7 @@ import AdminSidebar from "../components/partials/AdminSidebar";
 import AdminHeader from "../components/partials/AdminHeader";
 
 export default {
-  head: {
-    title: "Home page",
-    meta: [
-      {
-        hid: "description",
-        name: "description",
-        content: "Home page description",
-      },
-    ],
-  },
+  
   components: { AdminHeader, AdminSidebar, MobileHeader },
   mounted() {
     const script = document.createElement("script");

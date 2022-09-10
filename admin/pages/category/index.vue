@@ -55,6 +55,16 @@ import CategoryFilter from "../../components/category-components/CategoryFilter"
 export default {
   name: "index",
   middleware: "auth",
+  head: {
+    title: 'Category',
+    meta: [
+      {
+        hid: "description",
+        name: "description",
+        content: "Category description",
+      },
+    ],
+  },
   components: {
     CategoryFilter,
     Pagination,
@@ -111,6 +121,7 @@ export default {
       }
     },
   },
+  
 };
 </script>
 

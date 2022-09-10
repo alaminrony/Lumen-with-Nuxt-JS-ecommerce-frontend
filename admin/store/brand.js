@@ -12,6 +12,7 @@ export const state = () => ({
   page: 1,
   brandList: {},
   allBrands: [], // used to fill brand dropdown in product create screen
+  getHeadTitle: "Brand Title"
 });
 
 export const mutations = {
@@ -43,6 +44,7 @@ export const mutations = {
 
 export const actions = {
   create({ commit, dispatch, state }, options) {
+    // console.log(dispatch);return false;
     commit("shared/resetStatusMessagesParameters", null, { root: true });
     commit(
       "shared/setStatusMessageParameter",
@@ -183,6 +185,7 @@ export const actions = {
 
     BrandApi.update(this.$axios, payload, state.brand.id)
       .then((response) => {
+        // console.log(response);return false;
         commit(
           "shared/setStatusMessageParameter",
           { key: "showLoading", val: false },
