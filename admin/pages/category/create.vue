@@ -100,6 +100,18 @@ import CategoryFeatures from "../../components/category-components/CategoryFeatu
 export default {
   name: "create",
   middleware: "auth",
+  head() {
+    return {
+      title: 'Category Create',
+      meta: [
+        {
+          hid: "description",
+          name: "description",
+          content: "Category Create description",
+        },
+      ],
+    };
+  },
   components: {
     CategoryFeatures,
     Loader,

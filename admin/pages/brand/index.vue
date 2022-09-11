@@ -99,7 +99,6 @@ export default {
     handleFiltering(field, value) {
       this.$store.commit("brand/setFilterData", { key: field, val: value });
       this.$store.commit("brand/setPage", 1);
-
       this.$store.dispatch("brand/listBrands", this.getPayload());
     },
     getPayload() {

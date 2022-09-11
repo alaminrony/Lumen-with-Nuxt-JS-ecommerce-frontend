@@ -15,8 +15,11 @@
         <i class="fas fa-television"></i>Brands
       </nuxt-link>
     </li>
-    <li>
-      <a href="#"> <i class="fas fa-shopping-cart"></i>Products </a>
+
+    <li :class="{ active: this.$route.path.indexOf('product') !== -1 }">
+      <nuxt-link to="/product">
+        <i class="fas fa-shopping-cart"></i>Products
+      </nuxt-link>
     </li>
     <li>
       <a href="#"> <i class="fas fa-gears"></i>Orders</a>
@@ -37,12 +40,8 @@
 export default {
   name: "nav-menu",
   props: ["ulclass"],
-  mounted() {
-    
-  },
+  mounted() {},
 };
-
-
 </script>
 
 <style scoped>

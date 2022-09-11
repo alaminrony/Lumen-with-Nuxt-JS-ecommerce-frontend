@@ -1,0 +1,433 @@
+<template>
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">
+          <strong>{{
+            this.$route.params.edit
+              ? "Edit Product #" + this.$route.params.edit
+              : "Create New Product"
+          }}</strong>
+        </div>
+        <div class="card-body card-block">
+          <div class="form-group">
+            <label for="title" class="form-control-label"
+              >Title <span class="required-in">*</span></label
+            >
+            <input
+              type="text"
+              id="title"
+              name="title"
+              placeholder="Enter product title"
+              class="form-control"
+              :value="this.product.title"
+              @change="updateField($event)"
+            />
+          </div>
+          <div class="form-group">
+            <label for="category_id" class="form-control-label"
+              >Category <span class="required-in">*</span></label
+            >
+            <select
+              name="category_id"
+              id="category_id"
+              class="form-control"
+              :value="this.product.category_id"
+              @change="updateField($event)"
+              v-html="this.$store.state.category.categoryHtmlTree"
+            ></select>
+          </div>
+          <div class="form-group">
+            <label for="product_code" class="form-control-label"
+              >Product Code</label
+            >
+            <input
+              type="text"
+              id="product_code"
+              name="product_code"
+              placeholder="Product code"
+              class="form-control"
+              :value="this.product.product_code"
+              @change="updateField($event)"
+            />
+          </div>
+          <div class="form-group">
+            <label for="brand_id" class="form-control-label">Brand </label>
+            <select
+              name="brand_id"
+              id="brand_id"
+              class="form-control"
+              :value="this.product.brand_id"
+              @change="updateField($event)"
+            >
+              <option value="">none</option>
+              <option
+                v-for="brand in this.$store.state.brand.allBrands"
+                :key="brand.id"
+                :value="brand.id"
+              >
+                {{ brand.title }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card">
+        <div class="card-header">
+          <strong>Pricing details</strong>
+        </div>
+        <div class="card-body">
+          <label for="price" class="form-control-label"
+            >Price <span class="required-in">*</span></label
+          >
+          <div class="input-group">
+            <input
+              type="text"
+              id="price"
+              name="price"
+              placeholder="Price"
+              class="form-control"
+              :value="this.product.price"
+              @change="updateField($event)"
+            />
+            <div class="input-group-append">
+              <span class="input-group-text">$</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="amount" class="form-control-label"
+              >Amount <span class="required-in">*</span></label
+            >
+            <input
+              type="number"
+              id="amount"
+              name="amount"
+              placeholder="Amount"
+              class="form-control"
+              :value="this.product.amount"
+              @change="updateField($event)"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <strong>Description</strong>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-control-label">Description</label>
+            <textarea
+              id="description"
+              name="description"
+              class="form-control"
+              rows="8"
+              :value="this.product.description"
+              @change="updateField($event)"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <strong>Product Photos</strong>
+          <span style="font-size: 12px">(Select multiple images)</span>
+        </div>
+        <div class="card-body">
+          <div class="row" id="preview">
+            <div
+              class="col-lg-3 photo-wrapper"
+              v-for="(preview, index) of this.$store.state.product
+                .files_preview"
+              :key="index"
+            >
+              <img :src="preview" class="photo_preview" />
+            </div>
+          </div>
+          <input
+            type="file"
+            class="form-control"
+            name="image[]"
+            multiple
+            accept="image/*"
+            @change="handlePhotos"
+          />
+
+          <div class="row" v-if="this.$store.state.product.gallery.length">
+            <div
+              class="col-lg-3"
+              v-for="(record, index) of this.$store.state.product.gallery"
+            >
+              <img :src="record.image_url.small" class="photo_preview" />
+              <a
+                href="#"
+                class="btn btn-danger"
+                @click.prevent="removeImage(record.id)"
+                title="remove"
+                ><i class="fa fa-remove"></i
+              ></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <strong>Features</strong>
+        </div>
+        <div class="card-body">
+          <div v-if="this.$store.state.product.features.length">
+            <div
+              class="form-group"
+              v-for="feature in this.$store.state.product.features"
+            >
+              <label class="form-control-label">{{
+                feature.field_title
+              }}</label>
+              <input
+                :type="feature.field_type === 1 ? 'text' : 'color'"
+                :name="'feature[' + feature.field_id + ']'"
+                placeholder=""
+                class="form-control"
+                :value="feature.field_value"
+                @change="updateFeatureValue($event, feature.field_id)"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-12 discount-wrapper">
+      <div class="discount-badge" v-if="this.product.discount > 0">
+        {{ this.product.discount }} %
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <strong>Discount details</strong>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-lg-2">
+              <div class="form-group">
+                <label for="discount" class="form-control-label"
+                  >Discount</label
+                >
+                <input
+                  type="number"
+                  id="discount"
+                  name="discount"
+                  class="form-control"
+                  min="0"
+                  max="100"
+                  :value="this.product.discount"
+                  @change="updateField($event)"
+                />
+              </div>
+            </div>
+            <div class="col-lg-5">
+              <div class="form-group">
+                <label class="form-control-label">Discount start date</label>
+                <input
+                  type="text"
+                  id="discount_start_date"
+                  name="discount_start_date"
+                  class="form-control"
+                  min="0"
+                  max="100"
+                  :value="this.product.discount_start_date"
+                  @change="updateField($event)"
+                />
+              </div>
+            </div>
+            <div class="col-lg-5">
+              <div class="form-group">
+                <label class="form-control-label">Discount end date</label>
+                <input
+                  type="text"
+                  id="discount_end_date"
+                  name="discount_end_date"
+                  class="form-control"
+                  min="0"
+                  max="100"
+                  :value="this.product.discount_end_date"
+                  @change="updateField($event)"
+                />
+              </div>
+            </div>
+
+            <div
+              class="col-lg-12 text-center"
+              v-if="
+                product.price !== '' &&
+                product.discount !== '' &&
+                product.discount > 0
+              "
+            >
+              <p>
+                Original price: <del>{{ product.price }}</del>
+              </p>
+              <p>
+                Price after discount:
+                <strong>{{ this.getPriceWithDiscount() }}</strong>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          <strong>Display options</strong>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="form-group">
+                <label for="featured" class="form-control-label"
+                  >Is Featured Product</label
+                >
+                <select
+                  id="featured"
+                  name="featured"
+                  class="form-control"
+                  :value="this.product.featured"
+                  @change="updateField($event)"
+                >
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+  
+  <script>
+export default {
+  name: "ProductForm",
+  components: {},
+  data() {
+    return {};
+  },
+  computed: {
+    product: {
+      get() {
+        return this.$store.state.product.product;
+      },
+    },
+  },
+  methods: {
+    updateField(e) {
+      this.$store.commit("product/setProduct", {
+        key: e.target.name,
+        value: e.target.value,
+      });
+
+      if (e.target.name == "category_id") {
+        this.$store.dispatch("category/showCategory", e.target.value);
+
+        this.$store.commit("product/resetFeatures");
+
+        setTimeout(() => {
+          if (this.$store.state.category.features.length) {
+            const features = [...this.$store.state.category.features];
+
+            features.map((feature) => {
+              this.$store.commit("product/appendToFeatures", {
+                field_id: feature.id,
+                field_title: feature.field_title,
+                field_type: feature.field_type,
+                field_value: "",
+              });
+            });
+          }
+        }, 300);
+      }
+    },
+    handlePhotos(event) {
+      this.$store.commit("product/setFiles", event.target.files);
+
+      this.previewPhotos();
+    },
+    previewPhotos() {
+      this.$store.commit("product/clearFilesPreview");
+
+      this.$store.state.product.files.map((file) => {
+        const self = this;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          self.$store.commit("product/appendFilesPreview", e.target.result);
+        };
+        reader.readAsDataURL(file);
+      });
+    },
+    updateFeatureValue(event, id) {
+      this.$store.commit("product/updateFeatureValue", {
+        id,
+        value: event.target.value,
+      });
+    },
+    getPriceWithDiscount() {
+      return (
+        this.product.price - this.product.price * (this.product.discount / 100)
+      );
+    },
+    removeImage(id) {
+      if (confirm("Are you sure?")) {
+        this.$store.dispatch("product/removeImage", id);
+      }
+    },
+  },
+  mounted() {},
+};
+</script>
+  
+  <style>
+.required-in {
+  color: red;
+}
+
+.calendar-view {
+  top: -200px !important;
+}
+
+.photo_preview {
+  width: 90px;
+  height: 130px;
+}
+
+.discount-wrapper {
+  position: relative;
+}
+
+.discount-badge {
+  background: red;
+  position: absolute;
+  width: 88px;
+  height: 34px;
+  z-index: 9999;
+  right: 17px;
+  top: 9px;
+  color: #fff;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.photo-wrapper {
+  text-align: center;
+  border: 2px solid #ccc;
+  margin: 8px;
+}
+</style>

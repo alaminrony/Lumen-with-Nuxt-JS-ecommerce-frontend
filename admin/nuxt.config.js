@@ -3,7 +3,8 @@ export default {
   ** Nuxt rendering mode
   ** See https://nuxtjs.org/api/configuration-mode
   */
-  mode: 'spa',
+  // mode: 'spa',
+  ssr: false,
   /*
   ** Nuxt target
   ** See https://nuxtjs.org/api/configuration-target
@@ -54,6 +55,9 @@ export default {
   ** Global CSS
   */
   css: [
+    'quill/dist/quill.core.css',
+    'quill/dist/quill.snow.css',
+    'quill/dist/quill.bubble.css'
   ],
   /*
   ** Plugins to load before mounting the App
@@ -81,8 +85,6 @@ export default {
     // 'bootstrap-vue/nuxt',
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
-    '@nuxtjs/toast',
-    'nuxt-sweetalert2',
   ],
   /*
   ** Axios module configuration
@@ -96,7 +98,7 @@ export default {
   ** See https://nuxtjs.org/api/configuration-build/
   */
   build: {
-
+    postcss: null,
   },
   srcDir: __dirname,
   buildDir: '.nuxt/admin'
