@@ -35,10 +35,23 @@
               Loader
           },
           fetch() {
+            this.$store.dispatch('category/getCategoryHtmlTree');
+            this.$store.dispatch('brand/getAllBrands');
+  
+            // load product details
+            setTimeout(() => {
+              if(this.$route.params.edit) {
+                this.id = this.$route.params.edit;
+                this.$store.dispatch('product/show', this.$route.params.edit);
+              }
+            }, 200);
           },
           methods: {
             update() {
-              
+              this.$store.dispatch('product/update', {
+                id: this.id,
+                router: this.$router
+              });
             }
           },
           mounted() {

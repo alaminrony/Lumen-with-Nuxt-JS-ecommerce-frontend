@@ -121,14 +121,13 @@
         <div class="card-body">
           <div class="form-group">
             <label class="form-control-label">Description</label>
-            <textarea
-              id="description"
-              name="description"
-              class="form-control"
-              rows="8"
+            <quillEditor
+              class="quill-editor"
               :value="this.product.description"
-              @change="updateField($event)"
-            ></textarea>
+              @change="updateTextAreaContent($event)"
+              :options="editorOption"
+            ></quillEditor>
+            <!-- <textarea id="description" name="description" class="form-control" rows="8" :value="this.product.description" @change="updateField($event)"></textarea>-->
           </div>
         </div>
       </div>
@@ -234,31 +233,35 @@
             <div class="col-lg-5">
               <div class="form-group">
                 <label class="form-control-label">Discount start date</label>
-                <input
-                  type="text"
-                  id="discount_start_date"
+                <Datepicker
                   name="discount_start_date"
-                  class="form-control"
-                  min="0"
-                  max="100"
+                  format="yyyy-MM-dd"
+                  input-class="form-control"
+                  :clear-button="true"
+                  calendar-class="calendar-view"
+                  :bootstrap-styling="true"
+                  clear-button-icon="fa fa-remove"
                   :value="this.product.discount_start_date"
-                  @change="updateField($event)"
-                />
+                  @input="updateStartDateField"
+                  @selected="updateStartDateField"
+                ></Datepicker>
               </div>
             </div>
             <div class="col-lg-5">
               <div class="form-group">
                 <label class="form-control-label">Discount end date</label>
-                <input
-                  type="text"
-                  id="discount_end_date"
+                <Datepicker
                   name="discount_end_date"
-                  class="form-control"
-                  min="0"
-                  max="100"
+                  format="yyyy-MM-dd"
+                  input-class="form-control"
+                  :clear-button="true"
+                  calendar-class="calendar-view"
+                  :bootstrap-styling="true"
+                  clear-button-icon="fa fa-remove"
                   :value="this.product.discount_end_date"
-                  @change="updateField($event)"
-                />
+                  @input="updateEndDateField"
+                  @selected="updateEndDateField"
+                ></Datepicker>
               </div>
             </div>
 
@@ -312,19 +315,44 @@
     </div>
   </div>
 </template>
-  
-  <script>
+
+<script>
+import Datepicker from "vuejs-datepicker";
+import { quillEditor } from "vue-quill-editor";
+
 export default {
   name: "ProductForm",
-  components: {},
+  components: {
+    Datepicker,
+    quillEditor,
+  },
   data() {
-    return {};
+    return {
+      editorOption: {
+        modules: {
+          toolbar: [
+            ["bold", "italic", "underline", "strike"],
+            ["blockquote", "code-block"],
+            [{ header: 1 }, { header: 2 }],
+            [{ list: "ordered" }, { list: "bullet" }],
+            [{ script: "sub" }, { script: "super" }],
+            [{ indent: "-1" }, { indent: "+1" }],
+            [{ direction: "rtl" }],
+            [{ size: ["small", false, "large", "huge"] }],
+            [{ header: [1, 2, 3, 4, 5, 6, false] }],
+            [{ font: [] }],
+            [{ color: [] }, { background: [] }],
+            [{ align: [] }],
+            ["clean"],
+            ["link", "image", "video"],
+          ],
+        },
+      },
+    };
   },
   computed: {
-    product: {
-      get() {
-        return this.$store.state.product.product;
-      },
+    product(){
+        return this.$store.getters['product/getProduct'];
     },
   },
   methods: {
@@ -353,6 +381,38 @@ export default {
             });
           }
         }, 300);
+      }
+    },
+    updateTextAreaContent(event) {
+      this.$store.commit("product/setProduct", {
+        key: "description",
+        value: event.html,
+      });
+    },
+    updateStartDateField(date) {
+      if (date) {
+        this.$store.commit("product/setProduct", {
+          key: "discount_start_date",
+          value: date.toLocaleDateString("en-US"),
+        });
+      } else {
+        this.$store.commit("product/setProduct", {
+          key: "discount_start_date",
+          value: "",
+        });
+      }
+    },
+    updateEndDateField(date) {
+      if (date) {
+        this.$store.commit("product/setProduct", {
+          key: "discount_end_date",
+          value: date.toLocaleDateString("en-US"),
+        });
+      } else {
+        this.$store.commit("product/setProduct", {
+          key: "discount_end_date",
+          value: "",
+        });
       }
     },
     handlePhotos(event) {
@@ -392,8 +452,8 @@ export default {
   mounted() {},
 };
 </script>
-  
-  <style>
+
+<style>
 .required-in {
   color: red;
 }

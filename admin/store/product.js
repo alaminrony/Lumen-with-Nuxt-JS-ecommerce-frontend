@@ -32,6 +32,12 @@ export const state = () => ({
   gallery: [],
 });
 
+export const getters = {
+  getProduct(state) {
+    return state.product;
+  },
+};
+
 export const mutations = {
   setProduct(state, payload) {
     if (payload.key === "price") {
@@ -86,9 +92,6 @@ export const mutations = {
     state.features = [];
     state.gallery = [];
   },
-  setGallery(state, data) {
-    state.gallery = data;
-  },
   setProductList(state, products) {
     state.product_list = products;
   },
@@ -98,10 +101,15 @@ export const mutations = {
   setFilterData(state, value) {
     state.filterData[value.key] = value.val;
   },
+  setGallery(state, data) {
+    state.gallery = data;
+  },
 };
 
 export const actions = {
   create({ commit, state, dispatch }, payload) {
+    console.log(payload);
+    return false;
     commit("shared/resetStatusMessagesParameters", null, { root: true });
     commit(
       "shared/setStatusMessageParameter",
@@ -144,14 +152,12 @@ export const actions = {
         }, 10000);
       });
   },
-
   listProducts({ commit }, payload = null) {
     ProductApi.list(this.$axios, payload).then((response) => {
       commit("setProductList", response.products);
     });
   },
-
-  delete({ commit, state }, id) {
+  delete({ commit, state, dispatch }, id) {
     commit("shared/resetStatusMessagesParameters", null, { root: true });
     commit(
       "shared/setStatusMessageParameter",
@@ -180,6 +186,7 @@ export const actions = {
       })
       .catch((err) => {
         console.log(err);
+        dispatch("showValidationErrors", err);
       })
       .finally(() => {
         setTimeout(() => {
@@ -187,10 +194,135 @@ export const actions = {
         }, 5000);
       });
   },
+  show({ commit, state, dispatch, rootState }, id) {
+    commit("shared/resetStatusMessagesParameters", null, { root: true });
+    commit(
+      "shared/setStatusMessageParameter",
+      { key: "showLoading", val: true },
+      { root: true }
+    );
+    commit("resetProduct");
 
-  show({ commit, state, dispatch, rootState }, id) {},
-  update({ commit, dispatch, state }, payload) {},
-  removeImage({ commit, state }, id) {},
+    ProductApi.show(this.$axios, id)
+      .then((response) => {
+        commit(
+          "shared/setStatusMessageParameter",
+          { key: "showLoading", val: false },
+          { root: true }
+        );
+
+        if (response.product) {
+          // set product details
+          for (let key in state.product) {
+            if (key === "discount" && response.product[key] == null) {
+              response.product[key] = 0;
+            }
+
+            if (
+              key === "discount_start_date" &&
+              response.product[key] == null
+            ) {
+              response.product[key] = "";
+            }
+
+            if (key === "discount_end_date" && response.product[key] == null) {
+              response.product[key] = "";
+            }
+
+            if (key === "brand_id" && response.product[key] == null) {
+              response.product[key] = "";
+            }
+
+            commit("setProduct", { key, value: response.product[key] });
+          }
+
+          // load category to retrieve features
+          dispatch("category/showCategory", state.product.category_id, {
+            root: true,
+          });
+
+          commit("resetFeatures");
+
+          setTimeout(() => {
+            if (rootState.category.features.length > 0) {
+              const features = [...rootState.category.features];
+
+              features.map((feature) => {
+                let productFeatureValue = "";
+                if (
+                  response.product.features &&
+                  response.product.features.find(
+                    (f) => f.field_id == feature.id
+                  ) !== undefined
+                ) {
+                  productFeatureValue = response.product.features.find(
+                    (f) => f.field_id == feature.id
+                  ).field_value;
+                } else {
+                  productFeatureValue = "";
+                }
+                commit("appendToFeatures", {
+                  field_id: feature.id,
+                  field_title: feature.field_title,
+                  field_type: feature.field_type,
+                  field_value: productFeatureValue,
+                });
+              });
+            }
+          }, 200);
+
+          // load gallery
+          if (response.product.gallery) {
+            commit("setGallery", response.product.gallery);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  },
+  update({ commit, dispatch, state }, payload) {
+    commit("shared/resetStatusMessagesParameters", null, { root: true });
+    commit(
+      "shared/setStatusMessageParameter",
+      { key: "showLoading", val: true },
+      { root: true }
+    );
+
+    const dataToSend = {};
+    dataToSend.product = state.product;
+    dataToSend.features = state.features;
+    dataToSend.files = state.files;
+
+    ProductApi.update(this.$axios, dataToSend, payload.id)
+      .then((response) => {
+        commit(
+          "shared/setStatusMessageParameter",
+          { key: "showLoading", val: false },
+          { root: true }
+        );
+        if (response.success) {
+          commit(
+            "shared/setStatusMessageParameter",
+            { key: "success_message", val: response.message },
+            { root: true }
+          );
+        }
+
+        setTimeout(() => {
+          commit("resetProduct");
+          payload.router.push("/product");
+        }, 2000);
+      })
+      .catch((err) => {
+        dispatch("showValidationErrors", err);
+      })
+      .finally(() => {
+        setTimeout(() => {
+          commit("shared/resetStatusMessagesParameters", null, { root: true });
+        }, 10000);
+      });
+  },
   showValidationErrors({ commit }, err) {
     commit(
       "shared/setStatusMessageParameter",
@@ -216,5 +348,44 @@ export const actions = {
         );
       }
     }
+  },
+  removeImage({ commit, state }, id) {
+    commit("shared/resetStatusMessagesParameters", null, { root: true });
+    commit(
+      "shared/setStatusMessageParameter",
+      { key: "showLoading", val: true },
+      { root: true }
+    );
+
+    ProductApi.deleteImage(this.$axios, id)
+      .then((response) => {
+        commit(
+          "shared/setStatusMessageParameter",
+          { key: "showLoading", val: false },
+          { root: true }
+        );
+        if (response.success) {
+          commit(
+            "shared/setStatusMessageParameter",
+            { key: "success_message", val: response.message },
+            { root: true }
+          );
+
+          const gallery = [...state.gallery];
+
+          commit(
+            "setGallery",
+            gallery.filter((gal) => gal.id !== id)
+          );
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+      .finally(() => {
+        setTimeout(() => {
+          commit("shared/resetStatusMessagesParameters", null, { root: true });
+        }, 10000);
+      });
   },
 };

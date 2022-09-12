@@ -36,6 +36,7 @@
           },
           methods: {
             save() {
+              // alert('jfdkljgk');return false;
               this.$store.dispatch('product/create', {router: this.$router});
             }
           },
